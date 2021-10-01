@@ -1,0 +1,122 @@
+{{!
+    show category select option here.
+}}
+
+<div class="row mb-5">
+   <div class="col-md-4">
+      {{#hascategory}}
+         <label for="category"> {{#str}} categorylabel, local_affiliation {{/str}} </label>
+         <select name="category" id="category" class="custom-select singleselect">
+         {{#categories}}
+            <option value="{{{ id }}}"> {{{ name }}} </option>
+         {{/categories}}
+         </select>
+      {{/hascategory}}
+   </div>
+</div>
+
+{{!
+    Course list cards here.
+}}
+
+{{#hascourse}}
+<div class="courses row category-browse-5 mb-5">
+   {{#courses}}
+      <div class="col-lg-6 col-xl-3">
+         <div class="top_courses ccnWithFoot">
+            <div class="thumb">
+               <img class="img-whp" src="{{{ image }}}">
+               <div class="overlay">
+                  <div class="tag">{{{ categoryname }}}</div>
+                  <a class="tc_preview_course" href="{{{courseurl}}}">{{#str}} previewc, local_affiliation {{/str}}</a>
+               </div>
+            </div>
+            <div class="details">
+               <div class="tc_content">
+                  <p>{{{ categoryname }}}</p>
+                  <a href="{{{ courseurl }}}">
+                     <h5> {{{ fullname }}} </h5>
+                  </a>
+                  <p> {{{ langs }}} </p>
+                  {{#summary}}
+                  <p>{{{ summary }}}...</p>
+                  {{/summary}}
+               </div>
+            </div>
+            <div class="tc_footer">
+               <button type="button" class="btn btn-primary btngeneratelink" data-id="{{id}}" >{{#str}} gererate_link , local_affiliation {{/str}}</button>
+               {{#price}}
+               <div class="tc_price float-right"> {{{price}}} </div>
+               {{/price}}
+            </div>
+         </div>
+      </div>
+   {{/courses}}
+</div>
+{{/hascourse}}
+
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel"> {{#str}} gererate_link_popup, local_affiliation {{/str}} </h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <span class="messagecopied badge badge-pill badge-info" style="display: none;"> {{#str}} gererate_link_popup_copied, local_affiliation  {{/str}} </span>
+        <p class="courseurlhere form-group" style="display:flex;">
+           <input  id="input" type="text"   class="form-control" />
+           <button id="copy"  type="button" class="btn btn-primary">Copy</button>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+{{#js}}
+    require(['jquery'], function($) {
+
+      $(".btngeneratelink").click(function(){
+         var courseid = $(this).data('id');
+
+          $.post("affiliation-ajax.php", { courseid: courseid },
+           function(data, status){
+            var generatedurl = data.url;
+
+            if(generatedurl){
+               $(".courseurlhere #input").empty().val(generatedurl);
+               $('#exampleModal').modal('show');
+            }
+
+           });
+
+      });
+
+      function copy() {
+        var copyText = document.querySelector("#input");
+        copyText.select();
+        document.execCommand("copy");
+        var message = document.querySelector(".messagecopied");
+        message.style.display = 'block';
+        setTimeout(function(){  message.style.display = 'none';  }, 2000);
+      }
+
+      document.querySelector("#copy").addEventListener("click", copy);
+
+
+    });
+{{/js}}
+
+<style>
+   .modal-dialog.modal-dialog-centered.modal-sm {
+       width: 50% !important;
+   }
+
+   input#input {
+       width: 80%;
+       margin-top: 3px;
+   }
+
+</style>
